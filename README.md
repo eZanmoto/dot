@@ -42,6 +42,15 @@ Installing
 using bash, or can be made executable using `chmod` and put in a directory in
 your `PATH` for convenience.
 
+A useful shortcut is to add an alias for `dot` to your shell initialisation
+script that contains the repository address:
+
+    alias dot='bash /path/to/dot http://user@github.com/user/repo'
+
+This simplifies the commands to just be `dot` and `dot /path/to/local/file`. We
+can also sync our shell initialisation script using `dot` which means that we
+only need to create our alias once.
+
 Tests
 -----
 

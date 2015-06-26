@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Copyright 2015 Sean Kelleher. All rights reserved.
+# Use of this source code is governed by a GPL
+# license that can be found in the LICENSE file.
+
+set -e
+
+function quit() {
+    echo >&2 "$1"
+    exit 1
+}
+
+function unhandled() {
+    echo >&2 "An unhandled event occurred:"
+    cat "$1"
+    exit 1
+}
+
+repo="$1"
+[ -n "$repo" ] \
+    || quit "usage: $0 <repo> [path]"
+
+# Code to get absolute path to file abstracted from
+#
+#     http://stackoverflow.com/a/17577143/497142
+path=$( (
+    if [ -n "$2" ] ; then
+        cd $(dirname "$2")
+        echo $PWD/$(basename "$2")
+    fi
+) )
+
+! echo "$path" | grep '>' \
+    || quit '`path` must not contain ">"'
+
+# The `-t` parameter is required for OS X implementation of `mktemp`.
+TMPD=$(mktemp -d -t '')
+git clone "$repo" "$TMPD" > /dev/null 2>&1
+cd "$TMPD"
+
+if [ -z "$path" ] ; then
+    for name in * ; do
+        path=$(sed 's@>@/@g' <<< $name)
+        mkdir -p $(dirname "$path")
+        ln -f "$name" "$path"
+    done
+else
+    name=$(sed 's@/@>@g' <<< $path)
+    ln -f "$path" "$name"
+    git add "$name"
+    # We don't have to worry about clobberring a user-created `stdout.log`
+    # because all files created by the user using this tool start with `>`.
+    git commit -m . > stdout || {
+        if grep 'nothing added to commit' stdout > /dev/null ; then
+            quit "No changes."
+        else
+            unhandled stdout
+        fi
+        exit 1
+    }
+
+    git push origin master > /dev/null 2>&1
+fi
+
+# TODO Ensure cleanup runs on exit.
+rm -rf $TMPD

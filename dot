@@ -35,9 +35,9 @@ path=$( (
     || quit '`path` must not contain ">"'
 
 # The `-t` parameter is required for OS X implementation of `mktemp`.
-TMPD=$(mktemp -d -t '')
-git clone "$repo" "$TMPD" > /dev/null 2>&1
-cd "$TMPD"
+tmpd=$(mktemp -d -t '')
+git clone "$repo" "$tmpd" > /dev/null 2>&1
+cd "$tmpd"
 
 if [ -z "$path" ] ; then
     for name in * ; do
@@ -64,4 +64,4 @@ else
 fi
 
 # TODO Ensure cleanup runs on exit.
-rm -rf $TMPD
+rm -rf $tmpd

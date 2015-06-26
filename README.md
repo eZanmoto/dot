@@ -16,7 +16,8 @@ Usage
 
 The above will store the file as `>path>to>local>file` in the specified
 repository. Note that the file path cannot contain `>` characters because these
-are reserved path characters in the context of `dot`.
+are reserved path characters in the context of `dot`. Also note that relative
+paths are allowed and are expanded to their absolute form.
 
     dot http://user@github.com/user/repo
 
@@ -25,7 +26,7 @@ omitted. This mode pulls all files stored in the repository to the locations
 they were pushed from.
 
 **WARNING** `dot` will overwrite any existing files at file paths contained in
-the repo.
+the repository.
 
 ### Notes
 

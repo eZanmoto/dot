@@ -96,4 +96,16 @@ setup() {
 }
 
 @test '`dot $repo` overwrites file if exists' {
+    echo 'initial' > file
+    bash $dot "$repo" file
+
+    cp file file.bak
+    echo 'update' > file
+
+    run bash $dot "$repo"
+    echo $output
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    diff file file.bak
 }

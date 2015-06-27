@@ -29,9 +29,12 @@ function handle() {
 repo="$1"
 shift
 
-# We add a trailing slash to the base directory if it's missing to simplify
-# handling paths.
-base=$(sed 's@/$@@' <<< "$1")/
+# We remove the trailing slash from the base directory if it's present to
+# simplify handling paths. The base path is removed from all paths, so by
+# removing the trailing slash we cause each path to have a `>` prefix in the
+# repository. This prefix allows us to store "meta" files, most notably the
+# `.git` directory, alongside the dotfiles in the repository.
+base=$(sed 's@/$@@' <<< "$1")
 shift
 
 ! echo "$path" | grep '>' \

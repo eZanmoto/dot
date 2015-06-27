@@ -29,10 +29,10 @@ setup() {
     mkdir b
     run bash "$dot" "$repo" "$PWD/a" "b/file"
     [ "$status" -eq 1 ]
-    [ "$output" = "'$PWD/b/file' is not in '$PWD/a/'" ]
+    [ "$output" = "'$PWD/b/file' is not in '$PWD/a'" ]
 }
 
-@test '`dot $repo $PWD file` adds `file` to `$repo`' {
+@test '`dot $repo $PWD file` adds `>file` to `$repo`' {
     echo 'initial' > file
 
     run bash "$dot" "$repo" "$PWD" file
@@ -40,10 +40,21 @@ setup() {
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/file file
+    diff repo/'>file' file
 }
 
-@test '`dot $repo $PWD a b` adds `a` and `b` to `$repo`' {
+@test '`dot $repo $PWD .git` adds `>.git` to `$repo`' {
+    echo 'initial' > .git
+
+    run bash "$dot" "$repo" "$PWD" .git
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/'>.git' .git
+}
+
+@test '`dot $repo $PWD a b` adds `>a` and `>b` to `$repo`' {
     echo 'a' > a
     echo 'b' > b
 
@@ -52,17 +63,19 @@ setup() {
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/a a
-    diff repo/b b
+    diff repo/'>a' a
+    diff repo/'>b' b
 }
 
 @test '`dot $repo $PWD file` outputs error if `file` missing' {
     run bash "$dot" "$repo" "$PWD" file
     [ "$status" -eq 1 ]
+    echo $output
+    echo "No file at '$PWD/file'"
     [ "$output" = "No file at '$PWD/file'" ]
 }
 
-@test '`dot $repo $PWD dir/file` adds `dir>file` to `$repo`' {
+@test '`dot $repo $PWD dir/file` adds `>dir>file` to `$repo`' {
     mkdir dir
     echo 'initial' > dir/file
 
@@ -71,7 +84,7 @@ setup() {
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/'dir>file' dir/file
+    diff repo/'>dir>file' dir/file
 }
 
 @test '`dot $repo $PWD dir/file` outputs error if `dir` missing' {
@@ -80,7 +93,7 @@ setup() {
     [ "$output" = "Couldn't open 'dir'" ]
 }
 
-@test '`dot $repo $PWD dir/dir/file` adds `dir>dir>file` to `$repo`' {
+@test '`dot $repo $PWD dir/dir/file` adds `>dir>dir>file` to `$repo`' {
     mkdir -p dir/dir
     echo 'initial' > dir/dir/file
 
@@ -89,10 +102,10 @@ setup() {
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/'dir>dir>file' dir/dir/file
+    diff repo/'>dir>dir>file' dir/dir/file
 }
 
-@test '`dot $repo $PWD/dir dir/dir/file` adds `dir>file` to `$repo`' {
+@test '`dot $repo $PWD/dir dir/dir/file` adds `>dir>file` to `$repo`' {
     mkdir -p dir/dir
     echo 'initial' > dir/dir/file
 
@@ -101,7 +114,7 @@ setup() {
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/'dir>file' dir/dir/file
+    diff repo/'>dir>file' dir/dir/file
 }
 
 @test '`dot $repo $PWD file` when `file` unchanged outputs "No changes."' {
@@ -118,14 +131,14 @@ setup() {
     bash "$dot" "$repo" "$PWD" file
 
     git clone "$repo" repo
-    diff repo/file file
+    diff repo/'>file' file
     rm -rf repo
 
     echo 'update' > file
     bash "$dot" "$repo" "$PWD" file
 
     git clone "$repo" repo
-    diff repo/file file
+    diff repo/'>file' file
 }
 
 @test '`dot $repo $PWD` creates `file` from `$repo` if missing' {

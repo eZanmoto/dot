@@ -7,8 +7,7 @@
 dot=$PWD/dot
 
 setup() {
-    export tmpd=$(mktemp -d -t tmp)
-    cd "$tmpd"
+    cd "$(mktemp -d -t tmp)"
 
     export repo=$(mktemp -d -t tmp)
     git init --bare "$repo" | sed 's/^/[SETUP] /'
@@ -17,93 +16,140 @@ setup() {
 @test '`dot` outputs usage message' {
     run bash "$dot"
     [ "$status" -eq 1 ]
-    [ "$output" = "usage: $dot <repo> [path]" ]
+    [ "$output" = "usage: $dot <repo> <base> [path]" ]
 }
 
-@test '`dot $repo file` adds `file` to `$repo`' {
+@test '`dot $repo` outputs usage message' {
+    run bash "$dot" "$repo"
+    [ "$status" -eq 1 ]
+    [ "$output" = "usage: $dot <repo> <base> [path]" ]
+}
+
+@test '`dot $repo $tmpd $PWD/file` outputs error message' {
+    tmpd=$(mktemp -d -t tmp)
+    run bash "$dot" "$repo" "$tmpd" "$PWD/file"
+    [ "$status" -eq 1 ]
+    [ "$output" = "'$PWD/file' is not in '$tmpd/'" ]
+}
+
+@test '`dot $repo $PWD file` adds `file` to `$repo`' {
     echo 'initial' > file
 
-    run bash "$dot" "$repo" file
+    run bash "$dot" "$repo" "$PWD" file
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    diff repo/* file
+    diff repo/file file
 }
 
-@test '`dot $repo dir/file` adds `dir>file` to `$repo`' {
+@test '`dot $repo $PWD dir/file` adds `dir>file` to `$repo`' {
     mkdir dir
     echo 'initial' > dir/file
 
-    run bash "$dot" "$repo" dir/file
+    run bash "$dot" "$repo" "$PWD" dir/file
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
     git clone "$repo" repo
-    [ "$(ls repo | wc -l)" -eq 1 ]
-    ls repo | grep 'dir>file$'
-    diff repo/* dir/file
+    diff repo/'dir>file' dir/file
 }
 
-@test '`dot $repo file` when `file` unchanged outputs "No changes."' {
-    echo 'initial' > file
-    bash "$dot" "$repo" file
+@test '`dot $repo $PWD dir/dir/file` adds `dir>dir>file` to `$repo`' {
+    mkdir -p dir/dir
+    echo 'initial' > dir/dir/file
 
-    run bash "$dot" "$repo" file
+    run bash "$dot" "$repo" "$PWD" dir/dir/file
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/'dir>dir>file' dir/dir/file
+}
+
+@test '`dot $repo $PWD/dir dir/dir/file` adds `dir>file` to `$repo`' {
+    mkdir -p dir/dir
+    echo 'initial' > dir/dir/file
+
+    run bash "$dot" "$repo" "$PWD/dir" dir/dir/file
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/'dir>file' dir/dir/file
+}
+
+@test '`dot $repo $PWD file` when `file` unchanged outputs "No changes."' {
+    echo 'initial' > file
+    bash "$dot" "$repo" "$PWD" file
+
+    run bash "$dot" "$repo" "$PWD" file
     [ "$status" -eq 1 ]
     [ "$output" = "No changes." ]
 }
 
-@test '`dot $repo file` overwrites `file` in `$repo`' {
+@test '`dot $repo $PWD file` overwrites `file` in `$repo`' {
     echo 'initial' > file
-    bash "$dot" "$repo" file
+    bash "$dot" "$repo" "$PWD" file
 
     git clone "$repo" repo
-    diff repo/* file
+    diff repo/file file
     rm -rf repo
 
     echo 'update' > file
-    bash "$dot" "$repo" file
+    bash "$dot" "$repo" "$PWD" file
 
     git clone "$repo" repo
-    diff repo/* file
+    diff repo/file file
 }
 
-@test '`dot $repo` creates `file` from `$repo` if missing' {
+@test '`dot $repo $PWD` creates `file` from `$repo` if missing' {
     echo 'initial' > file
-    bash "$dot" "$repo" file
+    bash "$dot" "$repo" "$PWD" file
     mv file file.bak
 
-    run bash "$dot" "$repo"
+    run bash "$dot" "$repo" "$PWD"
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
     diff file file.bak
 }
 
-@test '`dot $repo` creates path to `file` from `$repo` if missing' {
+@test '`dot $repo $PWD` creates path to `file` from `$repo` if missing' {
     mkdir dir
     echo 'initial' > dir/file
-    bash "$dot" "$repo" dir/file
+    bash "$dot" "$repo" "$PWD" dir/file
     mv dir dir.bak
 
-    run bash "$dot" "$repo"
+    run bash "$dot" "$repo" "$PWD"
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
     diff dir/file dir.bak/file
 }
 
-@test '`dot $repo` overwrites file if exists' {
+@test '`dot $repo $PWD` overwrites file if exists' {
     echo 'initial' > file
-    bash "$dot" "$repo" file
+    bash "$dot" "$repo" "$PWD" file
 
     cp file file.bak
     echo 'update' > file
 
-    run bash "$dot" "$repo"
+    run bash "$dot" "$repo" "$PWD"
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
     diff file file.bak
+}
+
+@test '`dot $repo $PWD/b` retrieves `file` pushed from `$PWD/a`' {
+    mkdir a
+    echo 'initial' > a/file
+    bash "$dot" "$repo" "$PWD/a" a/file
+
+    run bash "$dot" "$repo" "$PWD/b"
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    diff a/file b/file
 }

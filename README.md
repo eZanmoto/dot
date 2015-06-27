@@ -12,18 +12,19 @@ Usage
 
 `dot` has two modes of operation.
 
-    dot http://user@domain.com/user/repo /path/to/local/file
+    dot http://user@domain.com/user/repo /path/to /path/to/a/local/file
 
-The above will store the file as `>path>to>local>file` in the specified
-repository. Note that the file path cannot contain `>` characters because these
-are reserved path characters in the context of `dot`. Also note that relative
-paths are allowed and are expanded to their absolute form.
+The above will store the file as `a>local>file` in the specified repository.
+Note that the file path cannot contain `>` characters because these are reserved
+path characters in the context of `dot`. Also note that the file path may be
+relative to the current directory, but the base path `/path/to` must be
+absolute.
 
-    dot http://user@github.com/user/repo
+    dot http://user@github.com/user/repo /path/to
 
-This command is the same as in the first example, but with the second parameter
+This command is the same as in the first example, but with the third parameter
 omitted. This mode pulls all files stored in the repository to the locations
-they were pushed from.
+they were pushed from, relative to the base path.
 
 **WARNING** `dot` will overwrite any existing files at file paths contained in
 the repository.

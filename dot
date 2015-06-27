@@ -31,7 +31,9 @@ base=$(sed 's@/$@@' <<< "$2")/
 #     http://stackoverflow.com/a/17577143/497142
 path=$( (
     if [ -n "$3" ] ; then
-        cd $(dirname "$3")
+        dir=$(dirname "$3")
+        cd "$dir" 2> /dev/null \
+            || quit "Couldn't open '$dir'"
         abspath=$PWD/$(basename "$3")
         relpath=${abspath#$base}
         if [ "$abspath" = "$relpath" ] ; then

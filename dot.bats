@@ -55,6 +55,12 @@ setup() {
     diff repo/'dir>file' dir/file
 }
 
+@test '`dot $repo $PWD dir/file` outputs error if `dir` missing' {
+    run bash "$dot" "$repo" "$PWD" dir/file
+    [ "$status" -eq 1 ]
+    [ "$output" = "Couldn't open 'dir'" ]
+}
+
 @test '`dot $repo $PWD dir/dir/file` adds `dir>dir>file` to `$repo`' {
     mkdir -p dir/dir
     echo 'initial' > dir/dir/file

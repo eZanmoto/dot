@@ -167,6 +167,31 @@ setup() {
     diff file file.bak
 }
 
+@test '`dot $repo $PWD` retrieves multiple files from `$repo`' {
+    echo 'a' > a
+    echo 'b' > b
+    bash "$dot" "$repo" "$PWD" a b
+
+    mv a a.bak
+    mv b b.bak
+
+    bash "$dot" "$repo" "$PWD"
+
+    diff a a.bak
+    diff b b.bak
+}
+
+@test '`dot $repo $PWD` retrieves hidden files in `$repo`' {
+    echo 'initial' > .file
+    bash "$dot" "$repo" "$PWD" .file
+
+    mv .file .file.bak
+
+    bash "$dot" "$repo" "$PWD"
+
+    diff .file .file.bak
+}
+
 @test '`dot $repo $PWD/b` retrieves `file` pushed from `$PWD/a`' {
     mkdir a
     echo 'initial' > a/file

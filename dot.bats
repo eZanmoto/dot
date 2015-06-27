@@ -43,6 +43,25 @@ setup() {
     diff repo/file file
 }
 
+@test '`dot $repo $PWD a b` adds `a` and `b` to `$repo`' {
+    echo 'a' > a
+    echo 'b' > b
+
+    run bash "$dot" "$repo" "$PWD" a b
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/a a
+    diff repo/b b
+}
+
+@test '`dot $repo $PWD file` outputs error if `file` missing' {
+    run bash "$dot" "$repo" "$PWD" file
+    [ "$status" -eq 1 ]
+    [ "$output" = "No file at '$PWD/file'" ]
+}
+
 @test '`dot $repo $PWD dir/file` adds `dir>file` to `$repo`' {
     mkdir dir
     echo 'initial' > dir/file

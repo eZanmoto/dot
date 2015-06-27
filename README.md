@@ -10,24 +10,44 @@ colloquially called "dotfiles") using Git repositories.
 Usage
 -----
 
-`dot` has two modes of operation.
+### Summary
 
-    dot http://user@domain.com/user/repo /path/to /path/to/a/local/file
+    dot repo-address /home/user1 .your .dot .files
 
-The above will store the file as `a>local>file` in the specified repository.
-Note that the file path cannot contain `>` characters because these are reserved
-path characters in the context of `dot`. Also note that the file path may be
-relative to the current directory, but the base path `/path/to` must be
-absolute.
+Stores the `.your`, `.dot`, and `.files` files in the repository you specify
+(local or remote) and removes their `/home/user2` prefix.
 
-    dot http://user@github.com/user/repo /path/to
+    dot repo-address /home/user2
 
-This command is the same as in the first example, but with the third parameter
-omitted. This mode pulls all files stored in the repository to the locations
-they were pushed from, relative to the base path.
+Retrieves the files you stored in the repository and saves them locally,
+relative to `/home/user2`
 
 **WARNING** `dot` will overwrite any existing files at file paths contained in
 the repository.
+
+### Details
+
+The arguments to `dot` are as follows:
+
+    dot <repo> <base> [paths*]
+
+`dot` has two modes of operation, based on whether the optional path arguments
+are supplied.
+
+    dot http://user@domain.com/user/repo /path/to /path/to/a/dot/file other/file
+
+Assuming we are in `/path/to/the`, the above will store `/path/to/a/dot/file` as
+`a>dot>file` and `other/file` as `the>local>file` in the specified repository.
+Note that file paths cannot contain `>` characters because these are reserved
+path characters in the context of `dot`. Also note that the file paths may be
+relative to the current directory but the base path (`/path/to` in this example)
+must be absolute.
+
+    dot http://user@github.com/user/repo /path/to
+
+This command is the same as in the first example, but with the optional paths
+omitted. This mode pulls all files stored in the repository to the locations
+they were pushed from, relative to the base path.
 
 ### Notes
 
@@ -39,9 +59,9 @@ the repository.
 Installing
 ----------
 
-`dot` is a single bash script. It can be run from where it's downloaded to,
-using bash, or can be made executable using `chmod` and put in a directory in
-your `PATH` for convenience.
+`dot` is a single bash script. It can be run from where it was downloaded, using
+bash, or can be made executable using `chmod` and put in a directory in your
+`PATH` for convenience.
 
 A useful shortcut is to add an alias for `dot` to your shell initialisation
 script that contains the repository address:

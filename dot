@@ -11,37 +11,28 @@ function quit() {
     exit 1
 }
 
-function unhandled() {
-    echo >&2 "An unhandled event occurred:"
-    cat "$1"
-    exit 1
+# `handle $f $pat $msg` outputs `$msg` and exits if `$f` contains `$pat`,
+# otherwise it outputs the contents of `$f` and exits.
+function handle() {
+    if grep "$2" "$1" > /dev/null ; then
+        quit "$3"
+    else
+        echo >&2 "An unhandled event occurred:"
+        sed >&2 's/^/    /' "$1"
+        exit 1
+    fi
 }
 
 [ -n "$1" -a -n "$2" ] \
     || quit "usage: $0 <repo> <base> [path]"
 
 repo="$1"
+shift
 
 # We add a trailing slash to the base directory if it's missing to simplify
 # handling paths.
-base=$(sed 's@/$@@' <<< "$2")/
-
-# Code to get absolute path to file abstracted from
-#
-#     http://stackoverflow.com/a/17577143/497142
-path=$( (
-    if [ -n "$3" ] ; then
-        dir=$(dirname "$3")
-        cd "$dir" 2> /dev/null \
-            || quit "Couldn't open '$dir'"
-        abspath=$PWD/$(basename "$3")
-        relpath=${abspath#$base}
-        if [ "$abspath" = "$relpath" ] ; then
-            quit "'$abspath' is not in '$base'"
-        fi
-        echo "$relpath"
-    fi
-) )
+base=$(sed 's@/$@@' <<< "$1")/
+shift
 
 ! echo "$path" | grep '>' \
     || quit '`path` must not contain ">" after `base` component'
@@ -51,26 +42,45 @@ tmpd=$(mktemp -d -t '')
 git clone "$repo" "$tmpd" > /dev/null 2>&1
 cd "$tmpd"
 
-if [ -z "$path" ] ; then
+if [ "$#" -gt 0 ] ; then
+    while [ "$#" -gt 0 ] ; do
+        # Code to get absolute path to file abstracted from
+        #
+        #     http://stackoverflow.com/a/17577143/497142
+        path=$( (
+            dir=$(dirname "$1")
+            cd "$OLDPWD"
+            cd "$dir" 2> stdout \
+                || handle stdout \
+                    'No such file or directory' "Couldn't open '$dir'"
+            abspath=$PWD/$(basename "$1")
+            relpath=${abspath#$base}
+            if [ "$abspath" = "$relpath" ] ; then
+                quit "'$abspath' is not in '$base'"
+            fi
+            echo "$relpath"
+        ) )
+
+        name=$(sed 's@/@>@g' <<< $path)
+        ln -f "$base$path" "$name" 2> stdout \
+            || handle stdout \
+                'No such file or directory' "No file at '$base$path'"
+        git add "$name"
+
+        shift
+    done
+
+    # We don't have to worry about clobberring a user-created `stdout` file
+    # because the changes to it (if it exists) won't be committed.
+    git commit -m . > stdout \
+        || handle stdout 'nothing added to commit' 'No changes.'
+    git push origin master > /dev/null 2>&1
+else
     for name in * ; do
         path=$base$(sed 's@>@/@g' <<< $name)
         mkdir -p $(dirname "$path")
         ln -f "$name" "$path"
     done
-else
-    name=$(sed 's@/@>@g' <<< $path)
-    ln -f "$base$path" "$name"
-    git add "$name"
-    # We don't have to worry about clobberring a user-created `stdout` file
-    # because the changes to it (if it exists) won't be committed.
-    git commit -m . > stdout || {
-        if grep 'nothing added to commit' stdout > /dev/null ; then
-            quit "No changes."
-        else
-            unhandled stdout
-        fi
-    }
-    git push origin master > /dev/null 2>&1
 fi
 
 # TODO Ensure cleanup runs on exit.

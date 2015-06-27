@@ -15,7 +15,7 @@ setup() {
 }
 
 @test '`dot` outputs usage message' {
-    run bash $dot
+    run bash "$dot"
     [ "$status" -eq 1 ]
     [ "$output" = "usage: $dot <repo> [path]" ]
 }
@@ -23,7 +23,7 @@ setup() {
 @test '`dot $repo file` adds `file` to `$repo`' {
     echo 'initial' > file
 
-    run bash $dot "$repo" file
+    run bash "$dot" "$repo" file
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
@@ -35,7 +35,7 @@ setup() {
     mkdir dir
     echo 'initial' > dir/file
 
-    run bash $dot "$repo" dir/file
+    run bash "$dot" "$repo" dir/file
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
@@ -47,23 +47,23 @@ setup() {
 
 @test '`dot $repo file` when `file` unchanged outputs "No changes."' {
     echo 'initial' > file
-    bash $dot "$repo" file
+    bash "$dot" "$repo" file
 
-    run bash $dot "$repo" file
+    run bash "$dot" "$repo" file
     [ "$status" -eq 1 ]
     [ "$output" = "No changes." ]
 }
 
 @test '`dot $repo file` overwrites `file` in `$repo`' {
     echo 'initial' > file
-    bash $dot "$repo" file
+    bash "$dot" "$repo" file
 
     git clone "$repo" repo
     diff repo/* file
     rm -rf repo
 
     echo 'update' > file
-    bash $dot "$repo" file
+    bash "$dot" "$repo" file
 
     git clone "$repo" repo
     diff repo/* file
@@ -71,10 +71,10 @@ setup() {
 
 @test '`dot $repo` creates `file` from `$repo` if missing' {
     echo 'initial' > file
-    bash $dot "$repo" file
+    bash "$dot" "$repo" file
     mv file file.bak
 
-    run bash $dot "$repo"
+    run bash "$dot" "$repo"
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
@@ -84,10 +84,10 @@ setup() {
 @test '`dot $repo` creates path to `file` from `$repo` if missing' {
     mkdir dir
     echo 'initial' > dir/file
-    bash $dot "$repo" dir/file
+    bash "$dot" "$repo" dir/file
     mv dir dir.bak
 
-    run bash $dot "$repo"
+    run bash "$dot" "$repo"
     echo $output
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
@@ -97,12 +97,12 @@ setup() {
 
 @test '`dot $repo` overwrites file if exists' {
     echo 'initial' > file
-    bash $dot "$repo" file
+    bash "$dot" "$repo" file
 
     cp file file.bak
     echo 'update' > file
 
-    run bash $dot "$repo"
+    run bash "$dot" "$repo"
     echo $output
     [ "$status" -eq 0 ]
     [ "$output" = "" ]

@@ -43,6 +43,17 @@ setup() {
     diff repo/'>file' file
 }
 
+@test '`dot $repo $PWD file` does not modify directory' {
+    echo 'initial' > file
+    old=$(ls -A)
+
+    run bash "$dot" "$repo" "$PWD" file
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    [ "$old" = $(ls -A) ]
+}
+
 @test '`dot $repo $PWD .git` adds `>.git` to `$repo`' {
     echo 'initial' > .git
 

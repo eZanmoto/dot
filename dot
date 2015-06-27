@@ -53,8 +53,8 @@ if [ "$#" -gt 0 ] ; then
         path=$( (
             dir=$(dirname "$1")
             cd "$OLDPWD"
-            cd "$dir" 2> stdout \
-                || handle stdout \
+            cd "$dir" 2> "$tmpd/stdout" \
+                || handle "$tmpd/stdout" \
                     'No such file or directory' "Couldn't open '$dir'"
             abspath=$PWD/$(basename "$1")
             relpath=${abspath#$base}

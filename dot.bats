@@ -25,11 +25,11 @@ setup() {
     [ "$output" = "usage: $dot <repo> <base> [path]" ]
 }
 
-@test '`dot $repo $tmpd $PWD/file` outputs error message' {
-    tmpd=$(mktemp -d -t tmp)
-    run bash "$dot" "$repo" "$tmpd" "$PWD/file"
+@test '`dot $repo $PWD/a b/file` outputs error message' {
+    mkdir b
+    run bash "$dot" "$repo" "$PWD/a" "b/file"
     [ "$status" -eq 1 ]
-    [ "$output" = "'$PWD/file' is not in '$tmpd/'" ]
+    [ "$output" = "'$PWD/b/file' is not in '$PWD/a/'" ]
 }
 
 @test '`dot $repo $PWD file` adds `file` to `$repo`' {

@@ -17,7 +17,7 @@ Usage
     dot repo-address /home/user1 .your .dot .files
 
 Stores the `.your`, `.dot`, and `.files` files in the repository you specify
-(local or remote) and removes their `/home/user2` prefix.
+(local or remote) and removes their `/home/user` prefix.
 
     dot repo-address /home/user2
 

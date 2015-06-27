@@ -183,11 +183,15 @@ setup() {
 
 @test '`dot $repo $PWD` retrieves hidden files in `$repo`' {
     echo 'initial' > .file
-    bash "$dot" "$repo" "$PWD" .file
+    run bash "$dot" "$repo" "$PWD" .file
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
 
     mv .file .file.bak
 
-    bash "$dot" "$repo" "$PWD"
+    run bash "$dot" "$repo" "$PWD"
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
 
     diff .file .file.bak
 }

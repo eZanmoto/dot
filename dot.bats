@@ -196,6 +196,21 @@ setup() {
     diff .file .file.bak
 }
 
+@test '`dot $repo $PWD` retrieves files with whitespace in `$repo`' {
+    echo 'first' > 'a tricky name'
+    run bash "$dot" "$repo" "$PWD" 'a tricky name'
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    mv 'a tricky name' 'a tricky name.bak'
+
+    run bash "$dot" "$repo" "$PWD"
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    diff 'a tricky name' 'a tricky name.bak'
+}
+
 @test '`dot $repo $PWD/b` retrieves `file` pushed from `$PWD/a`' {
     mkdir a
     echo 'initial' > a/file

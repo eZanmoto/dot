@@ -76,10 +76,13 @@ if [ "$#" -gt 0 ] ; then
         || handle stdout 'nothing added to commit' 'No changes.'
     git push origin master > /dev/null 2>&1
 else
-    for name in $(ls -A | sed 's@.git@@') ; do
-        path=$base$(sed 's@>@/@g' <<< $name)
-        mkdir -p $(dirname "$path")
-        ln -f "$name" "$path"
+    shopt -s dotglob nullglob
+    for name in * ; do
+        if [ "$name" != ".git" ] ; then
+            path=$base$(sed 's@>@/@g' <<< "$name")
+            mkdir -p $(dirname "$path")
+            ln -f "$name" "$path"
+        fi
     done
 fi
 

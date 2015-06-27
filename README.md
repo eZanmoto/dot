@@ -5,7 +5,9 @@ About
 -----
 
 `dot` is a bash script for synchronising personal configuration files (often
-colloquially called "dotfiles") using Git repositories.
+colloquially called "dotfiles") using Git repositories. See
+[dotfiles](https://github.com/eZanmoto/dotfiles) for an example repository using
+this approach.
 
 Usage
 -----

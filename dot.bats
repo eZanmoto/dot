@@ -88,7 +88,6 @@ setup() {
     mv dir dir.bak
 
     run bash "$dot" "$repo"
-    echo $output
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 
@@ -103,7 +102,6 @@ setup() {
     echo 'update' > file
 
     run bash "$dot" "$repo"
-    echo $output
     [ "$status" -eq 0 ]
     [ "$output" = "" ]
 

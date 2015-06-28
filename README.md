@@ -70,9 +70,21 @@ script that contains the repository address:
 
     alias dot='bash http://user@github.com/user/repo $HOME'
 
-This simplifies the commands to just be `dot` and `dot /path/to/local/file`. We
-can also sync our shell initialisation script using `dot` which means that we
-only need to create our alias once.
+This simplifies the commands to just be `dot` and `dot files`. We can also sync
+our shell initialisation script using `dot` which means that we only need to
+create our alias once.
+
+Another trick is to use `curl`/`wget` to run the most up-to-date version of
+`dot`, which can also be used in the alias:
+
+    alias dot='curl --silent https://raw.githubusercontent.com/ezanmoto/dot/master/dot | bash -s - http://user@github.com/user/repo'
+
+Note that you can specify a specific revision of the script to mitigate the
+security concerns of always running the newest version. Finally note that if you
+have this alias in a shell initialisation script that has been committed to the
+repository in the alias then you can simply run the command directly on a new
+computer to "install" `dot` on it and pull all your configurations down in one
+go.
 
 Tests
 -----

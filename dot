@@ -41,8 +41,8 @@ shift
     || quit '`path` must not contain ">" after `base` component'
 
 # The `-t` parameter is required for OS X implementation of `mktemp`.
-tmpd=$(mktemp -d -t '')
-errd=$(mktemp -d -t '')
+tmpd=$(mktemp -d -t 'tmp.XXXXXXXXXX')
+errd=$(mktemp -d -t 'tmp.XXXXXXXXXX')
 git clone "$repo" "$tmpd" > /dev/null 2> "$errd/stderr" \
     || handle "$errd/stderr" \
         "bash: git: command not found" "Couldn't find \`git\` command"

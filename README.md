@@ -93,3 +93,13 @@ Unit tests for `dot` are contained in `dot.bats` and are run using
 [bats](https://github.com/sstephenson/bats):
 
     bats dot.bats
+
+Alternatively, the tests can be run in the canonical environment for this
+project defined in `Dockerfile`. The following creates the environment and runs
+all tests in it:
+
+    bash docker_test.sh
+
+`docker_test.sh` suppresses the output from building and running Docker
+containers until something goes wrong. Passing the `-v` flag causes
+`docker_test.sh` to output build progress information as it is generated.

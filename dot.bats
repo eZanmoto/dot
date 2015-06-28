@@ -7,9 +7,9 @@
 dot=$PWD/dot
 
 setup() {
-    cd "$(mktemp -d -t tmp)"
+    cd $(mktemp -d -t 'tmp.XXXXXXXXXX')
 
-    export repo=$(mktemp -d -t tmp)
+    export repo=$(mktemp -d -t 'tmp.XXXXXXXXXX')
     git init --bare "$repo" | sed 's/^/[SETUP] /'
 }
 

@@ -34,7 +34,7 @@ shift
 # removing the trailing slash we cause each path to have a `>` prefix in the
 # repository. This prefix allows us to store "meta" files, most notably the
 # `.git` directory, alongside the dotfiles in the repository.
-base=$(sed 's@/$@@' <<< "$1")
+base=$(sed 's|/$||' <<< "$1")
 shift
 
 ! echo "$path" | grep '>' \

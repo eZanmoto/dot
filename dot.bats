@@ -246,6 +246,19 @@ setup() {
     diff 'a tricky name' 'a tricky name.bak'
 }
 
+@test '`dot $repo $PWD` handles `stdout` and `stderr` filenames' {
+    echo 'stdout' > stdout
+    echo 'stderr' > stderr
+
+    run bash "$dot" "$repo" "$PWD" stdout stderr
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/'>stdout' stdout
+    diff repo/'>stderr' stderr
+}
+
 @test '`dot $repo $PWD/b` retrieves `file` pushed from `$PWD/a`' {
     mkdir a
     echo 'initial' > a/file

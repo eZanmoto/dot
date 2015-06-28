@@ -90,6 +90,6 @@ Tests
 -----
 
 Unit tests for `dot` are contained in `dot.bats` and are run using
-[bat](https://github.com/sstephenson/bats):
+[bats](https://github.com/sstephenson/bats):
 
     bats dot.bats

@@ -43,6 +43,17 @@ setup() {
     diff repo/'>file' file
 }
 
+@test '`dot $repo $PWD file` outputs error if `git` not installed' {
+    echo 'initial' > file
+
+    echo 'echo >&2 "bash: git: command not found" && exit 127' > git
+    chmod +x git
+
+    PATH="$PWD:$PATH" run bash "$dot" "$repo" "$PWD" file
+    [ "$status" -eq 1 ]
+    [ "$output" = "Couldn't find \`git\` command" ]
+}
+
 @test '`dot $repo $PWD file` does not modify directory' {
     echo 'initial' > file
     old=$(ls -A)

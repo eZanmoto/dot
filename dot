@@ -42,7 +42,10 @@ shift
 
 # The `-t` parameter is required for OS X implementation of `mktemp`.
 tmpd=$(mktemp -d -t '')
-git clone "$repo" "$tmpd" > /dev/null 2>&1
+errd=$(mktemp -d -t '')
+git clone "$repo" "$tmpd" > /dev/null 2> "$errd/stderr" \
+    || handle "$errd/stderr" \
+        "bash: git: command not found" "Couldn't find \`git\` command"
 cd "$tmpd"
 
 if [ "$#" -gt 0 ] ; then
@@ -53,8 +56,8 @@ if [ "$#" -gt 0 ] ; then
         path=$( (
             dir=$(dirname "$1")
             cd "$OLDPWD"
-            cd "$dir" 2> "$tmpd/stdout" \
-                || handle "$tmpd/stdout" \
+            cd "$dir" 2> "$errd/stdout" \
+                || handle "$errd/stdout" \
                     'No such file or directory' "Couldn't open '$dir'"
             abspath=$PWD/$(basename "$1")
             relpath=${abspath#$base}
@@ -65,18 +68,16 @@ if [ "$#" -gt 0 ] ; then
         ) )
 
         name=$(sed 's@/@>@g' <<< $path)
-        ln -f "$base$path" "$name" 2> stdout \
-            || handle stdout \
+        ln -f "$base$path" "$name" 2> "$errd/stdout" \
+            || handle "$errd/stdout" \
                 'No such file or directory' "No file at '$base$path'"
         git add "$name"
 
         shift
     done
 
-    # We don't have to worry about clobberring a user-created `stdout` file
-    # because the changes to it (if it exists) won't be committed.
-    git commit -m . > stdout \
-        || handle stdout 'nothing added to commit' 'No changes.'
+    git commit -m . > "$errd/stdout" \
+        || handle "$errd/stdout" 'nothing to commit' 'No changes.'
     git push origin master > /dev/null 2>&1
 else
     shopt -s nullglob

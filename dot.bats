@@ -65,6 +65,17 @@ setup() {
     diff repo/'>.git' .git
 }
 
+@test '`dot $repo / $PWD/file` adds file to `$repo`' {
+    echo 'initial' > file
+
+    run bash "$dot" "$repo" / "$PWD"/file
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+
+    git clone "$repo" repo
+    diff repo/*file file
+}
+
 @test '`dot $repo $PWD a b` adds `>a` and `>b` to `$repo`' {
     echo 'a' > a
     echo 'b' > b

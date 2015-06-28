@@ -58,7 +58,7 @@ if [ "$#" -gt 0 ] ; then
                     'No such file or directory' "Couldn't open '$dir'"
             abspath=$PWD/$(basename "$1")
             relpath=${abspath#$base}
-            if [ "$abspath" = "$relpath" ] ; then
+            if [ -n "$base" -a "$abspath" = "$relpath" ] ; then
                 quit "'$abspath' is not in '$base'"
             fi
             echo "$relpath"

@@ -67,7 +67,7 @@ if [ "$#" -gt 0 ] ; then
             echo "$relpath"
         ) )
 
-        name=$(sed 's@/@>@g' <<< $path)
+        name=$(sed 's|/|>|g' <<< $path)
         ln -f "$base$path" "$name" 2> "$errd/stderr" \
             || handle "$errd/stderr" \
                 'No such file or directory' "No file at '$base$path'"
@@ -83,7 +83,7 @@ else
     shopt -s nullglob
     GLOBIGNORE=.git
     for name in * ; do
-        path=$base$(sed 's@>@/@g' <<< "$name")
+        path=$base$(sed 's|>|/|g' <<< "$name")
         mkdir -p $(dirname "$path")
         ln -f "$name" "$path"
     done

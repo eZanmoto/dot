@@ -39,17 +39,20 @@ are supplied.
     dot http://user@domain.com/user/repo /path/to /path/to/a/dot/file other/file
 
 Assuming we are in `/path/to/the`, the above will store `/path/to/a/dot/file` as
-`>a>dot>file` and `other/file` as `>the>local>file` in the specified repository.
+`>a>dot>file` and `other/file` as `>the>other>file` in the specified repository.
 Note that file paths cannot contain `>` characters because these are reserved
 path characters in the context of `dot`. Also note that the file paths may be
 relative to the current directory but the base path (`/path/to` in this example)
 must be absolute.
 
-    dot http://user@github.com/user/repo /path/to
+    dot http://user@github.com/user/repo /path/for
 
 This command is the same as in the first example, but with the optional paths
 omitted. This mode pulls all files stored in the repository to the locations
-they were pushed from, relative to the base path.
+they were pushed from, relative to the base path. Continuing on from the first
+example, this command would store `>a>dot>file` at `/path/for/a/dot/file` and
+would store `>the>other>file` at `/path/for/the/other/file`, replacing any files
+that were at those locations.
 
 ### Notes
 

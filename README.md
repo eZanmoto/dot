@@ -69,16 +69,16 @@ bash, or can be made executable using `chmod` and put in a directory in your
 `PATH` for convenience.
 
 A useful shortcut is to add an alias for `dot` to your shell initialisation
-script that contains the repository address:
+script that contains the repository address and your base directory:
 
-    alias dot='bash http://user@github.com/user/repo $HOME'
+    alias dot='bash /path/to/dot http://user@github.com/user/repo $HOME'
 
 This simplifies the commands to just be `dot` and `dot files`. We can also sync
 our shell initialisation script using `dot` which means that we only need to
 create our alias once.
 
 Another trick is to use `curl`/`wget` to run the most up-to-date version of
-`dot`, which can also be used in the alias:
+`dot`, which can also be used with the alias:
 
     alias dot='curl --silent https://raw.githubusercontent.com/ezanmoto/dot/master/dot | bash -s - http://user@github.com/user/repo'
 

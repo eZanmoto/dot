@@ -78,7 +78,7 @@ if [ "$#" -gt 0 ] ; then
 
     git commit -m . > "$errd/stdout" \
         || handle "$errd/stdout" 'nothing to commit' 'No changes.'
-    git push origin master > /dev/null 2>&1
+    git push origin master
 else
     shopt -s nullglob
     GLOBIGNORE=.git
